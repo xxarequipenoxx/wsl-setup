@@ -155,7 +155,7 @@ Press Enter or `n` for either provider to skip. If Azure CLI already has a worki
 
 - `--skip-auth`: never prompt or sign in (recommended for automated reruns).
 - `--setup-auth`: run both provider flows without asking the initial questions (interactive terminal required).
-- `--force-update`: redownload GitHub release binaries (Gitleaks, Argo CD, yq, optional clusteradm and Kubernetes/Helm) even when present.
+- `--force-update`: redownload GitHub release binaries (Gitleaks, Argo CD, yq, optional clusteradm, Kubernetes/Helm and OpenTofu) even when present. OpenTofu is pinned (1.12.6) and installed only after its signed checksum file is verified.
 
 The default checks for already installed binaries and skips release downloads when present. APT upgrades Ubuntu and APT-installed tools; `npm install -g` refreshes Codex/Gemini; nvm refreshes Node LTS; `uv self update` and `claude update` are attempted for existing user-local installs. `--force-update` is best used periodically for binaries not managed by package managers.
 
