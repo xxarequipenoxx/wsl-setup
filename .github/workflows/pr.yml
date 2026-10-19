@@ -4,12 +4,12 @@ name: pr
 # logic lives in github-standards; Renovate proposes new release tags as pull requests.
 #
 # Status checks: commits / conventional commits, security / gitleaks, security / zizmor.
-# These names are the project's required checks; auto-merge / auto-merge is never required.
+# These names are the project's required checks.
 
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, edited, ready_for_review]
+    types: [opened, synchronize, reopened, edited]
 
 permissions: {}
 
@@ -29,12 +29,3 @@ jobs:
     permissions:
       contents: read
       security-events: write
-
-  # Not a required check: turns auto-merge on unless the pull request announces a
-  # breaking change (auto-merge.yml in github-standards, secret AUTO_MERGE_TOKEN).
-  auto-merge:
-    uses: xxarequipenoxx/github-standards/.github/workflows/auto-merge.yml@v0.10.0
-    permissions:
-      contents: read
-    secrets:
-      token: ${{ secrets.AUTO_MERGE_TOKEN }}
