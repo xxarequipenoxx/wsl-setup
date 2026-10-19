@@ -1,0 +1,10 @@
+# zizmor policy (read by the zizmor job of github-standards security.yml and by the
+# pre-commit hook). The reusable workflows of this account are pinned to release tags by
+# design (github-standards README, section 1) and bumped by Renovate; every other action
+# stays pinned by commit SHA.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "xxarequipenoxx/*": ref-pin
+        "*": hash-pin
