@@ -101,7 +101,7 @@ bash bootstrap.sh --profile work --devops --default-shell zsh --setup-auth \
 
 This **does not** give permission to push, merge or run production pipelines automatically. Repository access, branch protection and CI rights are enforced server-side. Use the installed `ai-git-workflow --help` command to see explicit branch/push/PR/check/merge and Azure DevOps cloud pipeline listing actions. It does not trigger pipelines or bypass approvals.
 
-`az devops` supports Azure DevOps Services **cloud** only, not the ICRC/TFS on-prem server. Use your on-prem Git remote and server-compatible REST API for that service; do not put its URL into `--azure-org`.
+`az devops` supports Azure DevOps Services **cloud** only, not an on-prem Azure DevOps Server (formerly TFS). Use your on-prem Git remote and server-compatible REST API for that service; do not put its URL into `--azure-org`.
 
 The script can be rerun. `--setup-auth` requires an interactive WSL shell; do not use `sudo bash bootstrap.sh`.
 
