@@ -6,7 +6,7 @@ usage(){ cat <<'HELP'
 Usage: bash bootstrap.sh --profile work|personal [--devops] [--no-sandbox-config] [--default-shell zsh|bash] [--setup-auth|--skip-auth|--auth-github|--auth-azure] [--force-update] [--yes|--non-interactive] [--skip-step NAME] [--skip-os-upgrade] [--full-upgrade] [--acm-cli] [--no-sudo-nopasswd] [--git-name "Name"] [--git-email "email"] [--azure-org URL] [--azure-project NAME]
 Runs inside Ubuntu WSL2 as a normal user with sudo privileges.
 Installs AI agents, Azure CLI, GitHub CLI, and developer utilities.
---devops additionally installs kubectl, Helm, Terraform and Ansible.
+--devops additionally installs kubectl, Helm, Terraform, OpenTofu and Ansible.
 Installs Zsh + Oh My Zsh and Oh My Bash; preserves existing dotfiles.
 --default-shell zsh|bash optionally sets the default login shell (not by default).
 By default, asks before EACH installation phase [Y/n] and each authentication [y/N].
@@ -383,8 +383,8 @@ os.chmod(tmp,0o600); os.replace(tmp,p)
 PY
 fi
 
-if ((DEVOPS)) && phase devops "optional kubectl, Helm, Terraform and Ansible"; then
- log 'Installing optional DevOps tools: kubectl, Helm, Terraform, Ansible'
+if ((DEVOPS)) && phase devops "optional kubectl, Helm, Terraform, OpenTofu and Ansible"; then
+ log 'Installing optional DevOps tools: kubectl, Helm, Terraform, OpenTofu, Ansible'
  # Kubernetes: download binaries and matching checksum from the official distribution service.
  if should_install kubectl; then
  KVER="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
@@ -407,6 +407,22 @@ if ((DEVOPS)) && phase devops "optional kubectl, Helm, Terraform and Ansible"; t
  printf 'deb [arch=%s signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com %s main\n' "$ARCH" "$CODENAME" | sudo tee /etc/apt/sources.list.d/hashicorp.list >/dev/null
  sudo apt-get update
  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y terraform
+ # OpenTofu: pinned release, checksum file signed by the OpenTofu key (fingerprint pinned here).
+ if should_install tofu; then
+ TOFU_VERSION=1.12.6
+ TOFU_FPR='E3E6 E43D 84CB 852E ADB0  051D 0C0A F313 E5FD 9F80'
+ TOFU_BASE="https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}"
+ fetch "${TOFU_BASE}/tofu_${TOFU_VERSION}_linux_${ARCH}.zip" "$TEMP_DIR/tofu_${TOFU_VERSION}_linux_${ARCH}.zip"
+ fetch "${TOFU_BASE}/tofu_${TOFU_VERSION}_SHA256SUMS" "$TEMP_DIR/tofu_${TOFU_VERSION}_SHA256SUMS"
+ fetch "${TOFU_BASE}/tofu_${TOFU_VERSION}_SHA256SUMS.gpgsig" "$TEMP_DIR/tofu.gpgsig"
+ fetch https://get.opentofu.org/opentofu.asc "$TEMP_DIR/opentofu.asc"
+ gpg --show-keys --with-fingerprint "$TEMP_DIR/opentofu.asc" | grep -qF "$TOFU_FPR" || { echo 'OpenTofu signing key fingerprint mismatch' >&2; exit 1; }
+ gpg --batch --no-default-keyring --keyring "$TEMP_DIR/opentofu.kbx" --import "$TEMP_DIR/opentofu.asc" 2>/dev/null
+ gpg --batch --no-default-keyring --keyring "$TEMP_DIR/opentofu.kbx" --verify "$TEMP_DIR/tofu.gpgsig" "$TEMP_DIR/tofu_${TOFU_VERSION}_SHA256SUMS"
+ (cd "$TEMP_DIR" && sha256sum --check --status --ignore-missing "tofu_${TOFU_VERSION}_SHA256SUMS")
+ python3 -m zipfile -e "$TEMP_DIR/tofu_${TOFU_VERSION}_linux_${ARCH}.zip" "$TEMP_DIR/tofu-extract"
+ install -m 0755 "$TEMP_DIR/tofu-extract/tofu" "$HOME/.local/bin/tofu"
+ fi
  if pipx list --short 2>/dev/null | grep -q "^ansible "; then pipx upgrade ansible; else pipx install ansible --include-deps; fi
  # oc intentionally not auto-installed: obtain the version compatible with your OpenShift fleet.
 fi
