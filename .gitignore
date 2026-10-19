@@ -1,0 +1,11 @@
+# >>> ai-agentic-setup managed (AI assistant local config) >>>
+# AI assistant config is global (~/.ai); keep it out of project repos.
+.claude/
+.codex/
+.gemini/
+.vibe/
+.opencode/
+.ai/
+.cursor/
+.aider*
+# <<< ai-agentic-setup managed (AI assistant local config) <<<
