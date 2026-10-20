@@ -19,13 +19,13 @@ concurrency:
 
 jobs:
   commits:
-    uses: xxarequipenoxx/github-standards/.github/workflows/commits.yml@v0.10.0
+    uses: xxarequipenoxx/github-standards/.github/workflows/commits.yml@v0.10.1
     permissions:
       contents: read
       pull-requests: read
 
   security:
-    uses: xxarequipenoxx/github-standards/.github/workflows/security.yml@v0.10.0
+    uses: xxarequipenoxx/github-standards/.github/workflows/security.yml@v0.10.1
     permissions:
       contents: read
       security-events: write
