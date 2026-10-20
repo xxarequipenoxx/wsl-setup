@@ -1,0 +1,22 @@
+name: release
+
+# Every squash merge on main: commitizen computes the next version from the conventional
+# commits, the reusable workflow tags vX.Y.Z and publishes the GitHub release. docs, chore,
+# ci, test, refactor, style and build commits release nothing. Nothing is committed back.
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    uses: xxarequipenoxx/github-standards/.github/workflows/release.yml@v0.10.0
+    permissions:
+      contents: write
+

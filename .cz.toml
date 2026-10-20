@@ -1,0 +1,7 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version_provider = "scm"          # version read from Git tags, never written to files
+tag_format = "v$version"
+major_version_zero = true         # until 1.0.0: breaking changes bump the minor
+update_changelog_on_bump = false  # release notes go to the GitHub release, not to a file
+annotated_tag = true

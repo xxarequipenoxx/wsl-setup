@@ -1,0 +1,14 @@
+# Dependabot handles security updates only; Renovate (renovate.json) does every version
+# update. open-pull-requests-limit: 0 disables version updates without affecting security
+# updates, and the prefix makes security pull requests conventional ("build(deps): bump
+# ...") so they pass the commits check. Add one entry per ecosystem of the project (pip/uv,
+# npm, docker, terraform, ...): an ecosystem left out gets non-conventional titles.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: ci(deps)

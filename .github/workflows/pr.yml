@@ -3,8 +3,8 @@ name: pr
 # Thin caller of the reusable workflows of github-standards (README section 8 there). The
 # logic lives in github-standards; Renovate proposes new release tags as pull requests.
 #
-# Status checks: commits / conventional commits, security / gitleaks, security / zizmor.
-# These names are the project's required checks.
+# Status checks: commits / conventional commits, security / gitleaks, security / zizmor,
+# shellcheck.
 
 on:
   pull_request:
@@ -29,3 +29,30 @@ jobs:
     permissions:
       contents: read
       security-events: write
+
+  # No reusable workflow covers shell: shellcheck from the Ubuntu archive lints every tracked
+  # *.sh file.
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck --version
+
+      - name: Lint the shell scripts
+        run: |
+          mapfile -t scripts < <(git ls-files -- '*.sh')
+          if [[ "${#scripts[@]}" -eq 0 ]]; then
+            echo "::error::no shell script found"; exit 1
+          fi
+          shellcheck --format=gcc "${scripts[@]}"
