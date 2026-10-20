@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-PROFILE=""; DEVOPS=0; SUDO_NOPASSWD=1; CONFIG_SANDBOX=1; DEFAULT_SHELL=""; SETUP_AUTH=0; GIT_NAME=""; GIT_EMAIL=""; AZ_ORG=""; AZ_PROJECT=""; OS_UPDATE=1; OS_FULL_UPGRADE=0; SKIP_AUTH=0; AUTH_CHOICE="ask"; ACM_CLI=0; FORCE_UPDATE=0; INTERACTIVE_STEPS=1; SKIP_STEPS=","; RUN_ONLY=""; AUTH_GH="ask"; AUTH_AZ="ask"
+PROFILE=""; DEVOPS=0; SUDO_NOPASSWD=1; CONFIG_SANDBOX=1; DEFAULT_SHELL=""; GIT_NAME=""; GIT_EMAIL=""; AZ_ORG=""; AZ_PROJECT=""; OS_UPDATE=1; OS_FULL_UPGRADE=0; SKIP_AUTH=0; ACM_CLI=0; FORCE_UPDATE=0; INTERACTIVE_STEPS=1; SKIP_STEPS=","; AUTH_GH="ask"; AUTH_AZ="ask"
 usage(){ cat <<'HELP'
 Usage: bash bootstrap.sh --profile work|personal [--devops] [--no-sandbox-config] [--default-shell zsh|bash] [--setup-auth|--skip-auth|--auth-github|--auth-azure] [--force-update] [--yes|--non-interactive] [--skip-step NAME] [--skip-os-upgrade] [--full-upgrade] [--acm-cli] [--no-sudo-nopasswd] [--git-name "Name"] [--git-email "email"] [--azure-org URL] [--azure-project NAME]
 Runs inside Ubuntu WSL2 as a normal user with sudo privileges.
@@ -30,10 +30,10 @@ while (($#)); do
  case "$1" in
   --profile) PROFILE="${2:-}"; shift 2;;
   --devops) DEVOPS=1; shift;;
-  --setup-auth) SETUP_AUTH=1; SKIP_AUTH=0; AUTH_CHOICE="ask"; shift;;
+  --setup-auth) SKIP_AUTH=0; shift;;
   --auth-github) SKIP_AUTH=0; AUTH_GH="login"; shift;;
   --auth-azure) SKIP_AUTH=0; AUTH_AZ="login"; shift;;
-  --skip-auth) SKIP_AUTH=1; SETUP_AUTH=0; AUTH_CHOICE="skip"; AUTH_GH="skip"; AUTH_AZ="skip"; shift;;
+  --skip-auth) SKIP_AUTH=1; AUTH_GH="skip"; AUTH_AZ="skip"; shift;;
   --force-update) FORCE_UPDATE=1; shift;;
   --yes|--non-interactive) INTERACTIVE_STEPS=0; shift;;
   --skip-step) [[ -n "${2:-}" ]] || { echo "Missing step name" >&2; exit 2; }; SKIP_STEPS+="${2// /},"; shift 2;;
@@ -54,6 +54,8 @@ done
 [[ "$PROFILE" == work || "$PROFILE" == personal ]] || { usage; exit 2; }
 [[ -z "$DEFAULT_SHELL" || "$DEFAULT_SHELL" == zsh || "$DEFAULT_SHELL" == bash ]] || { usage; exit 2; }
 [[ "$(id -u)" -ne 0 ]] || { echo 'Run as a normal WSL user, not root.' >&2; exit 1; }
+# /etc/os-release is a system file, absent from the repository: do not follow it.
+# shellcheck source=/dev/null
 [[ -f /etc/os-release ]] && . /etc/os-release
 [[ "${ID:-}" == ubuntu ]] || { echo 'Ubuntu is required.' >&2; exit 1; }
 command -v sudo >/dev/null || { echo 'sudo required'; exit 1; }
