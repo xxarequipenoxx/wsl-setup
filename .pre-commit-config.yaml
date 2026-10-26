@@ -26,13 +26,13 @@ repos:
     hooks:
       - id: zizmor
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.19.2
+    rev: v4.19.3
     hooks:
       - id: commitizen
         stages: [commit-msg]
   # Private repository: pre-commit clones it with your Git credentials (gh auth setup-git).
   - repo: https://github.com/xxarequipenoxx/github-standards
-    rev: v0.10.1
+    rev: v0.12.2
     hooks:
       - id: no-ai-attribution
       - id: sops-encrypted
